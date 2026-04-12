@@ -6,10 +6,10 @@ type Props = {
 
 export default function AdminNav({ current }: Props) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 flex flex-wrap gap-2">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 flex flex-col sm:flex-row gap-2">
       <Link
         href="/admin/productos"
-        className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
+        className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
           current === 'productos' 
             ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' 
             : 'text-gray-600 hover:bg-gray-50'
@@ -21,7 +21,7 @@ export default function AdminNav({ current }: Props) {
 
       <Link
         href="/admin/pedidos"
-        className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
+        className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
           current === 'pedidos' 
             ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' 
             : 'text-gray-600 hover:bg-gray-50'

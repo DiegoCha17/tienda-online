@@ -11,12 +11,9 @@ export default function SiteHeader() {
               Mi Tienda
             </Link>
           </div>
-          <nav className="flex space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 transition-colors">
+          <nav className="flex space-x-4 md:space-x-8">
+            <Link href="/" className="text-gray-600 hover:text-blue-600 font-medium px-2 py-2 transition-colors">
               Inicio
-            </Link>
-            <Link href="/admin/productos" className="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 transition-colors">
-              Admin
             </Link>
           </nav>
           <div className="flex items-center">

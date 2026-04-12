@@ -70,8 +70,8 @@ export default function AdminProductTable({ products, categories }: Props) {
           <p className="text-gray-500 font-medium">No se encontraron productos para este filtro.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto rounded-xl">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="py-4 px-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Producto</th>

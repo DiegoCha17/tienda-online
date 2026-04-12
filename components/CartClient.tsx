@@ -103,17 +103,15 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
       }
 
       let message = `*NUEVO PEDIDO*\n\n`;
-      message += `*Orden Oficial:* #${data.orderId}\n`;
-      message += `*(Todos los precios ya fueron pasados a tu correo y confirmados en la BD)*\n\n`;
+      message += `*Orden Oficial:* ${data.orderId}\n\n`;
       message += `*Datos del Cliente:*\n`;
       message += `- Nombre: ${name}\n`;
       message += `- Correo: ${email}\n`;
-      if (phone) message += `- Teléfono: ${phone}\n`;
       if (address) message += `- Dirección: ${address}\n\n`;
 
       message += `*Productos:*\n`;
       cart.forEach(item => {
-        message += `- ${item.quantity}x ${item.name}\n`;
+        message += `${item.quantity}x ${item.name} (${formatCRC(item.price * item.quantity)})\n`;
       });
 
       message += `\n*TOTAL:* ${formatCRC(total)}`;

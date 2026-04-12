@@ -32,7 +32,7 @@ export default function StoreFront({ initialProducts, categories }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-10">
-        <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
           Descubre Nuestros <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Productos</span>
         </h1>
         <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-8">

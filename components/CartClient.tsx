@@ -103,7 +103,6 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
       }
 
       let message = `*NUEVO PEDIDO*\n\n`;
-      message += `*Orden Oficial:* ${data.orderId}\n\n`;
       message += `*Datos del Cliente:*\n`;
       message += `- Nombre: ${name}\n`;
       message += `- Correo: ${email}\n`;
@@ -256,7 +255,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
+                          className="w-full text-gray-900 placeholder-gray-400 border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
                           placeholder="Tu nombre y apellido"
                         />
                       </div>
@@ -267,7 +266,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
+                          className="w-full text-gray-900 placeholder-gray-400 border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
                           placeholder="tucorreo@ejemplo.com"
                         />
                       </div>
@@ -278,7 +277,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
+                          className="w-full text-gray-900 placeholder-gray-400 border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border"
                           placeholder="Ej: 8888-8888"
                         />
                       </div>
@@ -289,7 +288,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
                           rows={3}
-                          className="w-full border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border resize-none"
+                          className="w-full text-gray-900 placeholder-gray-400 border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none border resize-none"
                           placeholder="Provincia, Cantón, Distrito, y señas exactas..."
                         />
                       </div>

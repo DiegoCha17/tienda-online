@@ -1,15 +1,15 @@
 import StoreFront from '@/components/StoreFront';
+import { sql } from '@/lib/db';
 
 async function getProducts() {
-  const res = await fetch('http://localhost:3000/api/products', {
-    cache: 'no-store',
-  });
+  const products = await sql`
+    SELECT id, name, description, price, image_url, stock, category
+    FROM products
+    WHERE active = TRUE
+    ORDER BY id DESC
+  `;
 
-  if (!res.ok) {
-    throw new Error('No se pudieron cargar los productos');
-  }
-
-  return res.json();
+  return products;
 }
 
 export default async function HomePage() {
@@ -18,5 +18,5 @@ export default async function HomePage() {
   const categoriesSet = new Set(products.map((p: any) => p.category || 'General'));
   const categories = Array.from(categoriesSet) as string[];
 
-  return <StoreFront initialProducts={products} categories={categories.sort()} />;
+  return <StoreFront initialProducts={products as any} categories={categories.sort()} />;
 }

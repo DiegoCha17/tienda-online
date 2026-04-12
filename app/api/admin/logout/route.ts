@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-export async function POST() {
+export async function POST(req: Request) {
   const response = NextResponse.redirect(
-    new URL('/admin/login', 'http://localhost:3000')
+    new URL('/admin/login', req.url)
   );
 
   response.cookies.set('admin_auth', '', {

@@ -244,7 +244,7 @@ export default function AdminProductForm() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2 ml-1">Precio (₡) <span className="text-red-500">*</span></label>
                   <input
@@ -288,8 +288,8 @@ export default function AdminProductForm() {
               <Settings className="w-4 h-4" /> Especificaciones Extra
             </h3>
             
-            <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[2rem] space-y-6">
-              <div className="flex gap-3">
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[2rem] space-y-6 overflow-hidden">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={newSpecName}
@@ -356,8 +356,8 @@ export default function AdminProductForm() {
               <LayoutGrid className="w-4 h-4" /> Ficha Técnica (Opcional)
             </h3>
             
-            <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[2rem] space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[2rem] space-y-4 overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1 ml-1">Peso</label>
                   <input
@@ -377,7 +377,7 @@ export default function AdminProductForm() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1 ml-1">Alto</label>
                   <input
@@ -426,7 +426,7 @@ export default function AdminProductForm() {
               <ImageIcon className="w-4 h-4" /> Galería de Imágenes
             </h3>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {images.map((img, idx) => (
                 <div key={idx} className="relative group aspect-square rounded-[2rem] overflow-hidden border-2 border-gray-100 dark:border-slate-800">
                   <img src={img} className="w-full h-full object-cover" />

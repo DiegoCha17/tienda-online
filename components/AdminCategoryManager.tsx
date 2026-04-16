@@ -69,20 +69,20 @@ export default function AdminCategoryManager() {
         Gestión de Categorías
       </h2>
 
-      <div className="flex gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full">
         <input
           type="text"
           placeholder="Nombre de la nueva categoría..."
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && createCategory()}
-          className="flex-1 border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none border"
+          className="flex-1 w-full border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none border"
         />
         <button
           type="button"
           onClick={createCategory}
           disabled={loading}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm shadow-indigo-200"
+          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm shadow-indigo-200"
         >
           {loading ? 'Guardando...' : 'Agregar Categoría'}
         </button>

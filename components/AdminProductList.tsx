@@ -12,7 +12,7 @@ async function getCategories() {
 
 async function getProducts() {
   return await sql`
-    SELECT id, name, description, price, image_url, stock, category, active
+    SELECT id, name, description, price, image_url, images, specifications, stock, category, active
     FROM products
     ORDER BY id DESC
   `;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type Props = {
   product: {
@@ -10,6 +11,9 @@ type Props = {
     description: string;
     price: number;
     image_url: string;
+    images?: string[] | null;
+    specifications?: Record<string, string[]> | null;
+    features?: Record<string, string> | null;
     stock: number;
     category?: string;
     active: boolean;
@@ -27,6 +31,7 @@ export default function EditProductButton({ product }: Props) {
   const [stock, setStock] = useState(String(product.stock));
   const [category, setCategory] = useState(product.category || 'General');
   const [active, setActive] = useState(product.active);
+  const [features, setFeatures] = useState(product.features || {});
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -54,10 +59,10 @@ export default function EditProductButton({ product }: Props) {
       }
 
       setImageUrl(data.url);
-      alert('Imagen subida correctamente');
+      toast.success('Imagen subida correctamente');
     } catch (error) {
       console.error(error);
-      alert('No se pudo subir la imagen');
+      toast.error('No se pudo subir la imagen');
     } finally {
       setUploadingImage(false);
     }
@@ -65,7 +70,7 @@ export default function EditProductButton({ product }: Props) {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      alert('El nombre es obligatorio');
+      toast.warning('El nombre es obligatorio');
       return;
     }
 
@@ -73,12 +78,12 @@ export default function EditProductButton({ product }: Props) {
     const parsedStock = Number(stock || 0);
 
     if (Number.isNaN(parsedPrice) || parsedPrice <= 0) {
-      alert('Ingresa un precio válido mayor a 0');
+      toast.warning('Ingresa un precio válido mayor a 0');
       return;
     }
 
     if (Number.isNaN(parsedStock) || parsedStock < 0) {
-      alert('Ingresa un stock válido');
+      toast.warning('Ingresa un stock válido');
       return;
     }
 
@@ -98,6 +103,7 @@ export default function EditProductButton({ product }: Props) {
           stock: parsedStock,
           category,
           active,
+          features,
         }),
       });
 
@@ -107,12 +113,12 @@ export default function EditProductButton({ product }: Props) {
         throw new Error(data.error || 'Error al actualizar producto');
       }
 
-      alert('Producto actualizado correctamente');
+      toast.success('Producto actualizado correctamente');
       setOpen(false);
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert('No se pudo actualizar el producto');
+      toast.error('No se pudo actualizar el producto');
     } finally {
       setLoading(false);
     }
@@ -199,7 +205,58 @@ export default function EditProductButton({ product }: Props) {
               className="border p-2 rounded w-full"
             />
 
-            <label className="flex items-center gap-2">
+            {/* Ficha Técnica */}
+            <div className="border-t pt-4 mt-4">
+              <p className="font-bold mb-2">Ficha Técnica</p>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Peso"
+                  value={features.weight || ''}
+                  onChange={(e) => setFeatures({...features, weight: e.target.value})}
+                  className="border p-2 rounded w-full text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Textura"
+                  value={features.texture || ''}
+                  onChange={(e) => setFeatures({...features, texture: e.target.value})}
+                  className="border p-2 rounded w-full text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Alto"
+                  value={features.height || ''}
+                  onChange={(e) => setFeatures({...features, height: e.target.value})}
+                  className="border p-2 rounded w-full text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Ancho"
+                  value={features.width || ''}
+                  onChange={(e) => setFeatures({...features, width: e.target.value})}
+                  className="border p-2 rounded w-full text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Largo"
+                  value={features.length || ''}
+                  onChange={(e) => setFeatures({...features, length: e.target.value})}
+                  className="border p-2 rounded w-full text-sm"
+                />
+              </div>
+              <textarea
+                placeholder="Ingredientes"
+                value={features.ingredients || ''}
+                onChange={(e) => setFeatures({...features, ingredients: e.target.value})}
+                className="border p-2 rounded w-full text-sm"
+                rows={2}
+              />
+            </div>
+
+            <label className="flex items-center gap-2 border-t pt-4">
               <input
                 type="checkbox"
                 checked={active}

@@ -3,8 +3,12 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  image_url: string;
+  image_url: string; // Keep for backward compatibility/thumbnail
+  images?: string[]; // New: gallery array
+  specifications?: Record<string, string[]>; // New: { color: ["Red", "Blue"], size: ["S", "M"] }
   stock: number;
+  category?: string;
+  active?: boolean;
 };
 
 export type CartItem = {
@@ -13,4 +17,5 @@ export type CartItem = {
   price: number;
   image_url: string;
   quantity: number;
+  selected_specifications?: Record<string, string>; // New: { color: "Red", size: "M" }
 };

@@ -44,6 +44,10 @@ export async function POST(req: Request) {
       );
     }
 
+    const images = Array.isArray(body.images) ? body.images : [];
+    const specifications = typeof body.specifications === 'object' ? body.specifications : {};
+    const features = typeof body.features === 'object' ? body.features : {};
+
     const result = await sql`
       INSERT INTO products (
         name,
@@ -52,7 +56,10 @@ export async function POST(req: Request) {
         image_url,
         stock,
         category,
-        active
+        active,
+        images,
+        specifications,
+        features
       )
       VALUES (
         ${name},
@@ -61,7 +68,10 @@ export async function POST(req: Request) {
         ${image_url},
         ${stock},
         ${category},
-        TRUE
+        TRUE,
+        ${JSON.stringify(images)},
+        ${JSON.stringify(specifications)},
+        ${JSON.stringify(features)}
       )
       RETURNING id
     `;

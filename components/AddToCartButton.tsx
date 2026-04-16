@@ -27,6 +27,7 @@ export default function AddToCartButton({ product }: Props) {
     } else {
       cart.push({
         id: product.id,
+        cartItemId: Date.now().toString() + Math.random().toString(36).substring(2),
         name: product.name,
         price: Number(product.price),
         image_url: product.image_url,

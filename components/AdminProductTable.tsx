@@ -11,6 +11,9 @@ type Product = {
   description: string;
   price: number;
   image_url: string;
+  images: string[] | null;
+  specifications: Record<string, string[]> | null;
+  features: Record<string, string> | null;
   stock: number;
   category: string;
   active: boolean;
@@ -125,6 +128,9 @@ export default function AdminProductTable({ products, categories }: Props) {
                           description: product.description || '',
                           price: Number(product.price),
                           image_url: product.image_url || '',
+                          images: product.images || [],
+                          specifications: product.specifications || {},
+                          features: product.features || {},
                           stock: product.stock,
                           category: product.category || 'General',
                           active: product.active,

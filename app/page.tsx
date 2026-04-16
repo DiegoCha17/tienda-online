@@ -3,7 +3,7 @@ import { sql } from '@/lib/db';
 
 async function getProducts() {
   const products = await sql`
-    SELECT id, name, description, price, image_url, stock, category
+    SELECT id, name, description, price, image_url, images, specifications, stock, category
     FROM products
     WHERE active = TRUE
     ORDER BY id DESC

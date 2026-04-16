@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
+import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const outfitFont = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -26,9 +22,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${outfitFont.variable} h-full antialiased selection:bg-indigo-500/30 selection:text-indigo-900`}
     >
-      <body className="min-h-full flex flex-col pt-16 bg-gray-50 text-gray-900">
+      <body className="min-h-full flex flex-col pt-24 pb-8 bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+        <Toaster position="top-center" richColors />
         <SiteHeader />
         <main className="flex-grow">
           {children}

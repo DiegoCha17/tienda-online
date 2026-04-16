@@ -61,6 +61,9 @@ export async function PUT(req: Request, { params }: Params) {
       stock,
       category,
       active,
+      images,
+      specifications,
+      features,
     } = body;
 
     if (!name || price === undefined) {
@@ -79,7 +82,10 @@ export async function PUT(req: Request, { params }: Params) {
         image_url = ${image_url || ''},
         stock = ${stock || 0},
         category = ${category || 'General'},
-        active = ${active}
+        active = ${active},
+        images = ${JSON.stringify(images || [])},
+        specifications = ${JSON.stringify(specifications || {})},
+        features = ${JSON.stringify(features || {})}
       WHERE id = ${Number(id)}
     `;
 

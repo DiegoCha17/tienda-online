@@ -27,11 +27,11 @@ export default function ProductCard({ product, isCompact }: Props) {
 
   return (
     <div className={`group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full ${isCompact ? 'sm:rounded-3xl' : ''}`}>
-      <Link href={`/producto/${product.id}`} className={`relative overflow-hidden bg-slate-50 dark:bg-slate-800 ${isCompact ? 'aspect-video' : 'aspect-square'}`}>
+      <Link href={`/producto/${product.id}`} className={`relative flex items-center justify-center overflow-hidden bg-white p-2 ${isCompact ? 'aspect-video' : 'aspect-square'}`}>
         <img
           src={displayImage}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-sm"
         />
         {(product.category && product.category !== 'General') && (
           <span className="absolute top-3 left-3 sm:top-5 sm:left-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black text-indigo-700 dark:text-indigo-400 shadow-lg tracking-wider uppercase">
@@ -89,7 +89,7 @@ export default function ProductCard({ product, isCompact }: Props) {
               {product.specifications && Object.keys(product.specifications).length > 0 ? (
                 <Link
                   href={`/producto/${product.id}`}
-                  className="w-full py-3 px-4 rounded-xl font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-900/20 dark:shadow-white/10 flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="w-full py-3 px-4 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Elegir opciones

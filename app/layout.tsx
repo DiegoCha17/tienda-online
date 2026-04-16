@@ -24,7 +24,7 @@ export default function RootLayout({
       lang="es"
       className={`${outfitFont.variable} h-full antialiased selection:bg-indigo-500/30 selection:text-indigo-900`}
     >
-      <body className="min-h-full flex flex-col pt-24 pb-8 bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+      <body className="min-h-full flex flex-col pt-32 pb-8 sm:pt-36 bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
         <Toaster position="top-center" richColors />
         <SiteHeader />
         <main className="flex-grow">

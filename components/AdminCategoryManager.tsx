@@ -63,8 +63,8 @@ export default function AdminCategoryManager() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 mb-8 shadow-sm border border-gray-100">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 mb-8 shadow-sm border border-gray-100 dark:border-slate-800">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
         Gestión de Categorías
       </h2>
@@ -76,7 +76,7 @@ export default function AdminCategoryManager() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && createCategory()}
-          className="flex-1 w-full border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none border"
+          className="flex-1 w-full border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
         />
         <button
           type="button"
@@ -92,9 +92,9 @@ export default function AdminCategoryManager() {
         {categories.map((category) => (
           <div
             key={category.id}
-            className="group bg-gray-50 border border-gray-100 rounded-xl p-4 flex justify-between items-center hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all"
+            className="group bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl p-4 flex justify-between items-center hover:bg-white dark:hover:bg-slate-700 hover:border-gray-200 dark:hover:border-slate-600 hover:shadow-sm transition-all"
           >
-            <span className="font-semibold text-gray-700">{category.name}</span>
+            <span className="font-semibold text-gray-700 dark:text-slate-200">{category.name}</span>
             {category.name !== 'General' && (
               <button
                 type="button"

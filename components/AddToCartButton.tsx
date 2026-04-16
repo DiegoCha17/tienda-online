@@ -46,8 +46,8 @@ export default function AddToCartButton({ product }: Props) {
     <button
       onClick={addToCart}
       className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${isAdded
-          ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
-          : 'bg-gradient-to-r from-gray-900 to-black text-white hover:from-gray-800 hover:to-gray-900 shadow-lg shadow-gray-900/20 hover:-translate-y-0.5'
+          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+          : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30 hover:-translate-y-1'
         }`}
     >
       {isAdded ? (

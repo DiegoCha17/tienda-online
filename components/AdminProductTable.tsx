@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import DeleteProductButton from './DeleteProductButton';
-import EditProductButton from './EditProductButton';
-import { formatCRC } from '@/lib/currency';
+import { useState, useRef, useEffect } from "react";
+import DeleteProductButton from "./DeleteProductButton";
+import EditProductButton from "./EditProductButton";
+import { formatCRC } from "@/lib/currency";
+import { Package, Search, Filter, ChevronDown, Check } from "lucide-react";
 
 type Product = {
   id: number;
@@ -19,130 +20,222 @@ type Product = {
   active: boolean;
 };
 
-type Props = {
-  products: Product[];
-  categories: string[];
-};
+type Props = { products: Product[]; categories: string[] };
 
 export default function AdminProductTable({ products, categories }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const filteredProducts = selectedCategory
-    ? products.filter(p => (p.category || 'General') === selectedCategory)
-    : products;
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory = selectedCategory
+      ? (p.category || "General") === selectedCategory
+      : true;
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 mb-8 shadow-sm border border-gray-100 dark:border-slate-800 mt-8">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          Inventario de Productos ({filteredProducts.length})
-        </h2>
+    <div className="bg-white rounded-[2.5rem] p-6 sm:p-10 mb-8 shadow-2xl shadow-gray-200/40 border border-gray-100 mt-8 animate-in fade-in duration-500">
+      
+      {/* Header Section */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-12 gap-8">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-black text-gray-900 flex items-center gap-4">
+            <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-100">
+              <Package className="w-7 h-7 text-white" />
+            </div>
+            Inventario de Productos
+            <span className="ml-2 bg-gray-100 text-gray-400 text-sm font-black px-4 py-1 rounded-full">{filteredProducts.length}</span>
+          </h2>
+          <p className="text-gray-400 font-medium text-sm sm:text-base pl-1">
+            Gestión inteligente de catálogo, stock y precios activos.
+          </p>
+        </div>
+
+        <div className="w-full xl:w-auto flex flex-col sm:flex-row gap-4">
+          {/* Custom Search Bar */}
+          <div className="relative group flex-1">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="w-5 h-5 text-gray-300 group-focus-within:text-indigo-500 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-80 pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white rounded-[1.5rem] outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300 shadow-sm"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer border ${
-            !selectedCategory 
-              ? 'bg-gray-900 dark:bg-indigo-600 text-white shadow-md border-gray-900 dark:border-indigo-600' 
-              : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
-          }`}
-        >
-          Todos
-        </button>
-        {categories.map((category: string) => (
+      {/* Modern Filter Section */}
+      <div className="mb-12 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div className="relative" ref={dropdownRef}>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-3 ml-1">Categoría Filtrada</p>
           <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer border ${
-              selectedCategory === category 
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none border-indigo-600' 
-                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
-            }`}
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-4 bg-white border-2 border-gray-100 px-6 py-4 rounded-[1.5rem] shadow-sm hover:border-indigo-500 hover:shadow-md transition-all min-w-[240px]"
           >
-            {category}
+            <div className="bg-indigo-50 p-2 rounded-xl">
+              <Filter className="w-4 h-4 text-indigo-600" />
+            </div>
+            <span className="flex-1 text-left font-black text-gray-700 text-sm">
+              {selectedCategory || "Todas las categorías"}
+            </span>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
           </button>
-        ))}
+
+          {isOpen && (
+            <div className="absolute top-full left-0 mt-3 w-72 bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-3 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="space-y-1">
+                <button
+                  onClick={() => { setSelectedCategory(null); setIsOpen(false); }}
+                  className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold transition-all ${!selectedCategory ? 'bg-indigo-600 text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                >
+                  Todas las categorías
+                  {!selectedCategory && <Check className="w-4 h-4" />}
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => { setSelectedCategory(cat); setIsOpen(false); }}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                  >
+                    {cat}
+                    {selectedCategory === cat && <Check className="w-4 h-4" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {selectedCategory && (
+          <button 
+            onClick={() => setSelectedCategory(null)}
+            className="mt-6 sm:mt-0 text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-700 transition-colors"
+          >
+            Limpiar Filtro
+          </button>
+        )}
       </div>
 
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700">
-          <p className="text-gray-500 dark:text-slate-400 font-medium">No se encontraron productos para este filtro.</p>
+        <div className="text-center py-24 bg-gray-50/50 rounded-[3rem] border-4 border-dashed border-gray-100">
+          <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border border-gray-50">
+            <Package className="w-10 h-10 text-gray-200" />
+          </div>
+          <p className="text-gray-400 font-black text-xl mb-2 uppercase tracking-tight">Sin resultados</p>
+          <p className="text-gray-300 text-sm font-bold">Intenta ajustar tu búsqueda o filtros.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-slate-800">
-                <th className="py-4 px-4 text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Producto</th>
-                <th className="py-4 px-4 text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Categoría</th>
-                <th className="py-4 px-4 text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Precio / Stock</th>
-                <th className="py-4 px-4 text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Estado</th>
-                <th className="py-4 px-4 text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors group">
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-gray-100 dark:border-slate-700">
-                        <img
-                          src={product.image_url || 'https://via.placeholder.com/120'}
-                          alt={product.name}
-                          className="w-full h-full object-contain p-1"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900 dark:text-white">{product.name}</p>
-                        <p className="text-xs text-gray-400 dark:text-slate-500 capitalize">ID: {product.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300">
-                      {product.category || 'General'}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4">
-                    <p className="font-bold text-gray-900 dark:text-white">{formatCRC(Number(product.price))}</p>
-                    <p className={`text-sm font-medium ${product.stock > 10 ? 'text-green-600 dark:text-green-400' : product.stock > 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-                      {product.stock} disponibles
-                    </p>
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${product.active ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${product.active ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      {product.active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                      <EditProductButton
-                        product={{
-                          id: product.id,
-                          name: product.name,
-                          description: product.description || '',
-                          price: Number(product.price),
-                          image_url: product.image_url || '',
-                          images: product.images || [],
-                          specifications: product.specifications || {},
-                          features: product.features || {},
-                          stock: product.stock,
-                          category: product.category || 'General',
-                          active: product.active,
-                        }}
-                      />
-                      <DeleteProductButton productId={product.id} />
-                    </div>
-                  </td>
+        <div className="overflow-x-auto -mx-6 sm:mx-0">
+          <div className="inline-block min-w-full align-middle px-6 sm:px-0">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-gray-50">
+                  <th className="py-6 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] w-1/3">
+                    Producto & Referencia
+                  </th>
+                  <th className="py-6 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    Categoría
+                  </th>
+                  <th className="py-6 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    Precio & Stock
+                  </th>
+                  <th className="py-6 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    Estado
+                  </th>
+                  <th className="py-6 text-right text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    Acciones
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredProducts.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="group"
+                  >
+                    <td className="py-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0 p-2 shadow-sm group-hover:shadow-md transition-all duration-300">
+                          <img
+                            src={product.image_url || "https://placehold.co/100"}
+                            alt={product.name}
+                            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-black text-gray-900 group-hover:text-indigo-600 transition-colors text-base">
+                            {product.name}
+                          </p>
+                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-0.5">
+                            ID: #{product.id}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-6">
+                      <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-gray-50 text-gray-500 uppercase tracking-widest border border-gray-100 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-colors">
+                        {product.category || "General"}
+                      </span>
+                    </td>
+                    <td className="py-6">
+                      <p className="font-black text-gray-900 text-base">
+                        {formatCRC(Number(product.price))}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 10 ? "bg-emerald-500" : product.stock > 0 ? "bg-orange-500" : "bg-red-500"}`} />
+                        <p className={`text-[10px] font-black uppercase tracking-widest ${product.stock > 10 ? "text-emerald-600" : product.stock > 0 ? "text-orange-500" : "text-red-500"}`}>
+                          {product.stock} DISPONIBLES
+                        </p>
+                      </div>
+                    </td>
+                    <td className="py-6">
+                      <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                        product.active 
+                          ? "bg-emerald-50/30 text-emerald-600 border-emerald-100/50" 
+                          : "bg-red-50/30 text-red-600 border-red-100/50"
+                      }`}>
+                        {product.active ? "Activo" : "Inactivo"}
+                      </div>
+                    </td>
+                    <td className="py-6 text-right">
+                      <div className="flex items-center justify-end gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all scale-90 sm:scale-100">
+                        <EditProductButton
+                          product={{
+                            ...product,
+                            description: product.description || "",
+                            images: product.images || [],
+                            specifications: product.specifications || {},
+                            features: product.features || {},
+                            category: product.category || "General",
+                          }}
+                        />
+                        <DeleteProductButton productId={product.id} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

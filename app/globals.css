@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1f2937; /* gray-800 */
 }
 
 @theme inline {
@@ -11,16 +11,11 @@
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a; /* Midnight Blue / Slate 900 */
-    --foreground: #f8fafc; /* Slate 50 */
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }

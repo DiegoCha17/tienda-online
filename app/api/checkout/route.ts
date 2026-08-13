@@ -69,10 +69,6 @@ export async function POST(req: Request) {
     if (!cart.every(isCartItem)) {
       return NextResponse.json({ error: "El carrito contiene cantidades inválidas" }, { status: 400 });
     }
-    if (new Set(cart.map((item) => item.id)).size !== cart.length) {
-      return NextResponse.json({ error: "El carrito contiene productos repetidos" }, { status: 400 });
-    }
-
     const customer = body.customer as Customer;
     const requestedByProduct = new Map<number, number>();
     for (const item of cart) {
@@ -148,21 +144,21 @@ export async function POST(req: Request) {
           FROM requested r, new_order o
           WHERE p.id = r.id AND p.stock >= r.quantity
           RETURNING p.id
-        ), consistency_check AS (
-          SELECT CASE
-            WHEN (SELECT COUNT(*) FROM updated_stock) = ${requestedItems.length}
+         ), consistency_check AS (
+           SELECT CASE
+             WHEN (SELECT COUNT(*) FROM updated_stock) = ${requestedItems.length}
             THEN 1
-            ELSE (1 / 0)
-          END AS valid
-        )
-        SELECT (SELECT id FROM new_order LIMIT 1) AS order_id,
-          (SELECT COUNT(*) FROM updated_stock)::integer AS updated_count,
-          (SELECT valid FROM consistency_check) AS valid
+            ELSE 0
+           END AS valid
+         )
+         SELECT (SELECT id FROM new_order LIMIT 1) AS order_id,
+           (SELECT COUNT(*) FROM updated_stock)::integer AS updated_count,
+           (SELECT valid FROM consistency_check) AS valid
       `,
     ]);
 
-    const transactionResult = transactionRows[0]?.[0] as { order_id?: number; updated_count?: number } | undefined;
-    if (!transactionResult?.order_id || Number(transactionResult.updated_count) !== requestedItems.length) {
+    const transactionResult = transactionRows[0]?.[0] as { order_id?: number; updated_count?: number; valid?: number } | undefined;
+    if (!transactionResult?.order_id || Number(transactionResult.updated_count) !== requestedItems.length || Number(transactionResult.valid) !== 1) {
       return NextResponse.json(
         { error: "El inventario cambió. Revisa las cantidades e inténtalo de nuevo." },
         { status: 409 },

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isValidAdminToken } from "@/lib/admin-auth";
 
 // Protege las rutas de administración antes de renderizar o ejecutar la API.
 export function proxy(request: NextRequest) {
@@ -10,7 +11,7 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const hasSession = request.cookies.has("admin_auth");
+    const hasSession = isValidAdminToken(request.cookies.get("admin_auth")?.value);
     if (!hasSession && pathname.startsWith("/api/admin")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }

@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useCart } from "@/lib/hooks/useCart";
 import type { Product } from "@/lib/types";
 import { ProductJsonLd } from "@/components/JsonLd";
+import WishlistToggle from "@/components/WishlistToggle";
 
 type Props = { product: Product };
 
@@ -35,6 +36,7 @@ export default function ProductDetailClient({ product }: Props) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
   const [isAdded, setIsAdded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
@@ -48,6 +50,10 @@ export default function ProductDetailClient({ product }: Props) {
 
   const handleAddToCart = () => {
     if (product.stock <= 0) return;
+    if (quantity > product.stock) {
+      toast.error(`Solo hay ${product.stock} unidades disponibles.`);
+      return;
+    }
 
     if (product.specifications) {
       const requiredKeys = Object.keys(product.specifications);
@@ -58,7 +64,7 @@ export default function ProductDetailClient({ product }: Props) {
       }
     }
 
-    const result = addToCart(product, selectedSpecs);
+    const result = addToCart(product, selectedSpecs, quantity);
     
     if (result.success) {
       setIsAdded(true);
@@ -70,7 +76,7 @@ export default function ProductDetailClient({ product }: Props) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-in fade-in duration-1000">
+    <div className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-14 lg:px-8">
       <ProductJsonLd product={product} />
       {/* Botón Compacto */}
       <div className="flex items-center justify-between mb-4 mt-2">
@@ -89,12 +95,12 @@ export default function ProductDetailClient({ product }: Props) {
         </div>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-sm rounded-[2.5rem] p-5 sm:p-8 lg:p-12 shadow-2xl shadow-gray-200/50 border border-gray-50 flex flex-col lg:flex-row gap-8 lg:gap-16">
+      <div className="flex flex-col gap-8 rounded-3xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/40 sm:p-7 lg:flex-row lg:gap-12 lg:p-10">
         
         {/* Galería con Glow Effect */}
         <div className="w-full lg:w-1/2 space-y-6 relative">
           <div className="absolute -inset-4 bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
-          <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-gray-50 border border-gray-100 shadow-inner group">
+          <div className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-inner sm:rounded-3xl">
             {allImages.length > 0 ? (
               <Image
                 src={allImages[currentImageIndex] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"}
@@ -102,7 +108,7 @@ export default function ProductDetailClient({ product }: Props) {
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain transition-all duration-700 group-hover:scale-110 p-8"
+                className="object-contain p-5 transition-transform duration-500 group-hover:scale-105 sm:p-8"
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
@@ -152,46 +158,49 @@ export default function ProductDetailClient({ product }: Props) {
         </div>
 
         {/* Información Técnica & Compra */}
-        <div className="w-full lg:w-1/2 flex flex-col pt-0 sm:pt-4">
+        <div className="flex w-full flex-col pt-0 sm:pt-2 lg:w-1/2">
           <div className="flex items-center justify-end mb-4 h-6">
             <div className="flex gap-1">
                 {[1,2,3,4,5].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-indigo-100" />)}
             </div>
           </div>
 
-          <h1 className="text-4xl lg:text-7xl font-black text-gray-900 mb-6 leading-none tracking-tighter">
+           <h1 className="mb-4 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-6xl">
             {product.name}
           </h1>
 
-          <div className="flex items-center gap-6 mb-10">
-            <p className="text-4xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-violet-700 tracking-tighter">
-              {formatCRC(Number(product.price))}
-            </p>
+           <div className="mb-6 flex items-center gap-4">
+             <p className="text-3xl font-black tracking-tight text-indigo-700 sm:text-4xl lg:text-5xl">
+               {formatCRC(Number(product.price))}
+             </p>
+             <span className={`rounded-full px-3 py-1 text-xs font-bold ${product.stock > 0 ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+               {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
+             </span>
           </div>
 
-           <p className="text-gray-500 text-lg leading-relaxed font-bold mb-10 border-l-[6px] border-indigo-600 pl-8 italic bg-indigo-50/30 py-4 rounded-r-3xl">
+            <p className="mb-7 border-l-4 border-indigo-600 bg-indigo-50/50 py-3 pl-4 text-base font-medium leading-7 text-slate-600 sm:pl-5 sm:text-lg">
             {product.description || "Diseño y funcionalidad en su estado más puro."}
           </p>
 
-          <div className="space-y-12">
+           <div className="space-y-8">
             {product.specifications && Object.keys(product.specifications).length > 0 && (
-              <div className="space-y-10">
+               <div className="space-y-7">
                 {Object.entries(product.specifications).map(([key, values]) => (
                   <div key={key} className="space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <label className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">{key}</label>
                       {selectedSpecs[key] && (
                         <span className="text-[9px] font-black text-white bg-indigo-600 px-3 py-1 rounded-full uppercase">Selección: {selectedSpecs[key]}</span>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-2 sm:gap-3">
                       {values.map((val) => {
                         const isSelected = selectedSpecs[key] === val;
                         return (
                           <button
                             key={val}
                             onClick={() => setSelectedSpecs(prev => ({ ...prev, [key]: val }))}
-                            className={`min-w-[4.5rem] px-8 py-4 rounded-3xl font-black text-xs transition-all border-4 ${
+                             className={`min-h-11 min-w-16 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all ${
                               isSelected
                                 ? "bg-gray-900 border-gray-900 text-white shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] -translate-y-2"
                                 : "bg-white border-gray-50 text-gray-400 hover:border-indigo-100 hover:text-indigo-600"
@@ -207,15 +216,25 @@ export default function ProductDetailClient({ product }: Props) {
               </div>
             )}
 
-            {/* Quick Benefits Cards */}
-            <div className="grid grid-cols-2 gap-4">
-               <div className="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 flex flex-col gap-3">
-                  <div className="bg-white w-10 h-10 rounded-2xl shadow-sm flex items-center justify-center">
-                    <Truck className="w-5 h-5 text-indigo-600" />
-                  </div>
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Pago contra entrega</span>
+             <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-bold text-slate-700">Cantidad</span>
+               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                 <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity === 1} className="flex h-10 w-10 items-center justify-center rounded-lg text-lg text-slate-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40" aria-label="Reducir cantidad">−</button>
+                 <span className="w-10 text-center text-sm font-bold text-slate-900" aria-live="polite">{quantity}</span>
+                 <button type="button" onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} className="flex h-10 w-10 items-center justify-center rounded-lg text-lg text-slate-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40" aria-label="Aumentar cantidad">+</button>
                </div>
-               <div className="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 flex flex-col gap-3">
+                <WishlistToggle product={product} className="inline ml-auto" iconSize={19} />
+              </div>
+
+             {/* Quick Benefits Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                 <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
+                     <Truck className="h-5 w-5 text-indigo-600" />
+                   </div>
+                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Pago contra entrega</span>
+                </div>
+                 <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <div className="bg-white w-10 h-10 rounded-2xl shadow-sm flex items-center justify-center">
                     <CheckCircle2 className="w-5 h-5 text-indigo-600" />
                   </div>
@@ -229,7 +248,7 @@ export default function ProductDetailClient({ product }: Props) {
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock <= 0}
-                className={`w-full py-7 px-10 rounded-[2.5rem] font-black text-xl flex items-center justify-center gap-4 transition-all duration-500 relative ${
+                 className={`relative flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl px-5 py-4 text-base font-black transition-all duration-300 sm:text-lg ${
                   product.stock <= 0
                     ? "bg-gray-100 text-gray-300 cursor-not-allowed border-2 border-dashed border-gray-200"
                     : isAdded

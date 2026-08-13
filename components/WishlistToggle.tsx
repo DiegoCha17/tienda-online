@@ -27,7 +27,7 @@ export default function WishlistToggle({ product, className = "", iconSize = 20 
   return (
     <button
       onClick={handleToggle}
-      className={`absolute z-20 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-md hover:scale-110 transition-transform active:scale-95 ${className}`}
+      className={`${className.includes("inline") ? "" : "absolute z-20"} rounded-full bg-white/90 p-2 shadow-md backdrop-blur-md transition-transform hover:scale-110 active:scale-95 ${className.replace("inline", "")}`}
       aria-label={isFav ? "Quitar de favoritos" : "Agregar a favoritos"}
     >
       <Heart 

@@ -12,12 +12,12 @@ type Product = {
   description: string;
   price: number;
   image_url: string;
-  images: string[] | null;
-  specifications: Record<string, string[]> | null;
-  features: Record<string, string> | null;
+  images?: string[] | null;
+  specifications?: Record<string, string[]> | null;
+  features?: Record<string, string> | null;
   stock: number;
-  category: string;
-  active: boolean;
+  category?: string;
+  active?: boolean;
 };
 
 type Props = { products: Product[]; categories: string[] };
@@ -217,8 +217,9 @@ export default function AdminProductTable({ products, categories }: Props) {
                       </div>
                     </td>
                     <td className="py-6 text-right">
-                      <div className="flex items-center justify-end gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all scale-90 sm:scale-100">
+                      <div className="flex items-center justify-end gap-2 whitespace-nowrap opacity-100 transition-all sm:opacity-0 sm:group-hover:opacity-100">
                         <EditProductButton
+                          categories={categories}
                           product={{
                             ...product,
                             description: product.description || "",
@@ -226,6 +227,7 @@ export default function AdminProductTable({ products, categories }: Props) {
                             specifications: product.specifications || {},
                             features: product.features || {},
                             category: product.category || "General",
+                            active: product.active ?? false,
                           }}
                         />
                         <DeleteProductButton productId={product.id} />

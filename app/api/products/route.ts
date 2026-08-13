@@ -1,22 +1,23 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { cookies } from "next/headers";
+import { isValidAdminToken } from "@/lib/admin-auth";
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get("admin_auth")?.value === "true";
+    const isAuthenticated = isValidAdminToken(req.headers.get("cookie")?.match(/(?:^|;\s*)admin_auth=([^;]+)/)?.[1]);
     if (!isAuthenticated) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
     const body = await req.json();
     const { name, description, price, image_url, stock } = body;
-    if (!name || !price) {
+    const parsedPrice = Number(price);
+    const parsedStock = Number(stock ?? 0);
+    if (typeof name !== "string" || name.trim().length < 3 || !Number.isFinite(parsedPrice) || parsedPrice <= 0 || !Number.isSafeInteger(parsedStock) || parsedStock < 0) {
       return NextResponse.json(
         { error: "Nombre y precio son obligatorios" },
         { status: 400 },
       );
     }
-    await sql` INSERT INTO products ( name, description, price, image_url, stock, active ) VALUES ( ${name}, ${description || ""}, ${price}, ${image_url || ""}, ${stock || 0}, TRUE ) `;
+    await sql` INSERT INTO products ( name, description, price, image_url, stock, active ) VALUES ( ${name.trim()}, ${typeof description === "string" ? description.trim() : ""}, ${parsedPrice}, ${typeof image_url === "string" ? image_url.trim() : ""}, ${parsedStock}, TRUE ) `;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error creando producto:", error);

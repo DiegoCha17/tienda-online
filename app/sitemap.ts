@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Obtener productos para indexar
   const products = await sql`SELECT id FROM products WHERE active = TRUE`;
 
-  const productUrls = products.map((product: any) => ({
+  const productUrls = products.map((product) => ({
     url: `${baseUrl}/producto/${product.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

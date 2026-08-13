@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { cookies } from "next/headers";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { isValidAdminToken } from "@/lib/admin-auth";
 type Params = { params: Promise<{ id: string }> };
 export async function DELETE(_req: Request, { params }: Params) {
   try {
-    const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get("admin_auth")?.value === "true";
+    const isAuthenticated = isValidAdminToken(_req.headers.get("cookie")?.match(/(?:^|;\s*)admin_auth=([^;]+)/)?.[1]);
     if (!isAuthenticated) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
     const { id } = await params;
+    const categoryId = Number(id);
+    if (!Number.isSafeInteger(categoryId) || categoryId <= 0) return NextResponse.json({ error: "Categoría inválida" }, { status: 400 });
     const categoryRows =
-      await sql` SELECT name FROM categories WHERE id = ${Number(id)} `;
+      await sql` SELECT name FROM categories WHERE id = ${categoryId} `;
     if (categoryRows.length === 0) {
       return NextResponse.json(
         { error: "Categoría no encontrada" },
@@ -26,7 +28,10 @@ export async function DELETE(_req: Request, { params }: Params) {
       );
     }
     await sql` UPDATE products SET category = 'General' WHERE category = ${categoryName} `;
-    await sql` DELETE FROM categories WHERE id = ${Number(id)} `;
+    await sql` DELETE FROM categories WHERE id = ${categoryId} `;
+    revalidateTag("categories", "max");
+    revalidateTag("products", "max");
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error eliminando categoría:", error);

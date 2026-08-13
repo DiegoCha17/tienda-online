@@ -1,6 +1,5 @@
 import { STORE_NAME, STORE_DESCRIPTION, WHATSAPP_NUMBER } from "@/lib/constants";
 import type { Product } from "@/lib/types";
-import { formatCRC } from "@/lib/currency";
 
 export function OrganizationJsonLd() {
   const jsonLd = {

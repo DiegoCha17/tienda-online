@@ -25,6 +25,7 @@ export type CartItem = {
   price: number;
   image_url: string;
   quantity: number;
+  stock?: number;
   selectedSpecs?: Record<string, string>;
 };
 

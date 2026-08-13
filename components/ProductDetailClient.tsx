@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -17,24 +18,15 @@ import {
 } from "lucide-react";
 import { formatCRC } from "@/lib/currency";
 import { toast } from "sonner";
-
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  images: string[] | null;
-  specifications: Record<string, string[]> | null;
-  features: Record<string, string> | null;
-  stock: number;
-  category: string;
-};
+import { useCart } from "@/lib/hooks/useCart";
+import type { Product } from "@/lib/types";
+import { ProductJsonLd } from "@/components/JsonLd";
 
 type Props = { product: Product };
 
 export default function ProductDetailClient({ product }: Props) {
   const router = useRouter();
+  const { addToCart } = useCart();
   
   const allImages = Array.from(
     new Set([product.image_url, ...(product.images || [])])
@@ -66,47 +58,20 @@ export default function ProductDetailClient({ product }: Props) {
       }
     }
 
-    const raw = localStorage.getItem("cart");
-    const cart = raw ? JSON.parse(raw) : [];
-
-    const existing = cart.find((item: any) => {
-      if (item.id !== product.id) return false;
-      const itemSpecs = item.selectedSpecs || {};
-      const currentSpecs = selectedSpecs || {};
-      const keys1 = Object.keys(itemSpecs);
-      const keys2 = Object.keys(currentSpecs);
-      if (keys1.length !== keys2.length) return false;
-      return keys1.every((k) => itemSpecs[k] === currentSpecs[k]);
-    });
-
-    if (existing) {
-      if (existing.quantity >= product.stock) {
-        toast.error("Stock máximo alcanzado.");
-        return;
-      }
-      existing.quantity += 1;
+    const result = addToCart(product, selectedSpecs);
+    
+    if (result.success) {
+      setIsAdded(true);
+      toast.success(result.message);
+      setTimeout(() => setIsAdded(false), 2000);
     } else {
-      cart.push({
-        id: product.id,
-        cartItemId: Date.now().toString() + Math.random().toString(36).substring(2),
-        name: product.name,
-        price: Number(product.price),
-        image_url: allImages[0] || product.image_url,
-        quantity: 1,
-        selectedSpecs: { ...selectedSpecs },
-      });
+      toast.error(result.message);
     }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    window.dispatchEvent(new Event("cart-updated"));
-    setIsAdded(true);
-    toast.success("¡Agregado!");
-    setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-in fade-in duration-1000">
-      
+      <ProductJsonLd product={product} />
       {/* Botón Compacto */}
       <div className="flex items-center justify-between mb-4 mt-2">
         <button 
@@ -131,10 +96,13 @@ export default function ProductDetailClient({ product }: Props) {
           <div className="absolute -inset-4 bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
           <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-gray-50 border border-gray-100 shadow-inner group">
             {allImages.length > 0 ? (
-              <img
-                src={allImages[currentImageIndex]}
+              <Image
+                src={allImages[currentImageIndex] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"}
                 alt={product.name}
-                className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-contain transition-all duration-700 group-hover:scale-110 p-8"
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
@@ -144,7 +112,7 @@ export default function ProductDetailClient({ product }: Props) {
             )}
             
             {allImages.length > 1 && (
-              <div className="absolute inset-0 flex items-center justify-between px-4">
+              <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
                 <button
                   onClick={(e) => {e.stopPropagation(); handlePrevImage();}}
                   className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl hover:bg-white transition-all active:scale-90"
@@ -173,7 +141,7 @@ export default function ProductDetailClient({ product }: Props) {
                       : "border-transparent opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
                   }`}
                 >
-                  <img src={img} className="w-full h-full object-cover" />
+                  <Image src={img} alt="Thumbnail" fill sizes="80px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -288,7 +256,7 @@ export default function ProductDetailClient({ product }: Props) {
       {/* Descripción Detallada */}
       {product.features && Object.values(product.features).some(v => !!v) && (
         <div className="mt-24">
-          <div className="flex flex-col items-center mb-16 text-center space-y-4">
+          <div className="flex flex-col items-center mb-16 text-center space-y-4 animate-slide-up">
             <h2 className="text-4xl sm:text-5xl font-black text-gray-900 uppercase tracking-tighter leading-none">
               Descripción del Producto
             </h2>
@@ -302,7 +270,7 @@ export default function ProductDetailClient({ product }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Medidas Exactas Card */}
             {(product.features.height || product.features.width || product.features.length) && (
-              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-indigo-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden">
+              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-indigo-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden animate-slide-up">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
                 <div className="relative z-10">
                   <div className="bg-gray-900 w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-10 text-white shadow-xl shadow-gray-200">
@@ -335,7 +303,7 @@ export default function ProductDetailClient({ product }: Props) {
 
             {/* Peso Estimado Card */}
             {product.features.weight && (
-              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-emerald-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden">
+              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-emerald-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden animate-slide-up">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
                 <div className="relative z-10">
                   <div className="bg-gray-900 w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-10 text-white shadow-xl shadow-gray-200">
@@ -352,7 +320,7 @@ export default function ProductDetailClient({ product }: Props) {
 
             {/* Textura y Acabado Card */}
             {product.features.texture && (
-              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-orange-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden">
+              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-orange-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden animate-slide-up">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
                 <div className="relative z-10">
                   <div className="bg-gray-900 w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-10 text-white shadow-xl shadow-gray-200">
@@ -369,7 +337,7 @@ export default function ProductDetailClient({ product }: Props) {
 
             {/* Composición Card */}
             {product.features.ingredients && (
-              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-teal-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden">
+              <div className="group bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl hover:shadow-teal-100 hover:-translate-y-4 transition-all duration-700 relative overflow-hidden animate-slide-up">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
                 <div className="relative z-10">
                   <div className="bg-gray-900 w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-10 text-white shadow-xl shadow-gray-200">

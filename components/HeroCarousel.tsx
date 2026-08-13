@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const BANNERS = [
   {
@@ -37,42 +40,83 @@ export default function HeroCarousel() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleNext = () => {
+    setCurrent((prev) => (prev === BANNERS.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrev = () => {
+    setCurrent((prev) => (prev === 0 ? BANNERS.length - 1 : prev - 1));
+  };
+
   return (
-    <div className="relative w-full h-[300px] sm:h-[400px] rounded-3xl overflow-hidden shadow-2xl mb-12 group">
-      {BANNERS.map((banner, index) => (
-        <div
-          key={banner.id}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === current ? "opacity-100 z-10" : "opacity-0 z-0"
-          }`}
+    <div className="relative w-full h-[300px] sm:h-[400px] rounded-[2rem] overflow-hidden shadow-2xl mb-12 group">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0"
         >
           <div className="absolute inset-0 bg-gray-900">
-            <img
-              src={banner.image}
-              alt={banner.title}
-              className="w-full h-full object-cover opacity-60 mix-blend-overlay"
+            <Image
+              src={BANNERS[current].image}
+              alt={BANNERS[current].title}
+              fill
+              priority
+              className="object-cover opacity-60 mix-blend-overlay"
+              sizes="100vw"
             />
           </div>
-          <div className={`absolute inset-0 bg-gradient-to-r ${banner.color} opacity-80`}></div>
+          <div className={`absolute inset-0 bg-gradient-to-r ${BANNERS[current].color} opacity-80`}></div>
           <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 text-white text-shadow-sm">
-            <h2 className="text-3xl sm:text-5xl font-black mb-4 tracking-tight transform translate-y-0 transition-transform duration-700 delay-100">
-              {banner.title}
-            </h2>
-            <p className="text-lg sm:text-xl font-medium max-w-xl opacity-90 mb-8 leading-relaxed">
-              {banner.subtitle}
-            </p>
-            <div>
+            <motion.h2 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-3xl sm:text-5xl font-black mb-4 tracking-tight"
+            >
+              {BANNERS[current].title}
+            </motion.h2>
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="text-lg sm:text-xl font-medium max-w-xl opacity-90 mb-8 leading-relaxed"
+            >
+              {BANNERS[current].subtitle}
+            </motion.p>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
               <Link 
                 href="/#catalogo"
                 className="inline-block bg-white text-gray-900 font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform shadow-lg"
               >
                 Ver Colección
               </Link>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      ))}
+        </motion.div>
+      </AnimatePresence>
       
+      {/* Controles de Navegación */}
+      <button 
+        onClick={handlePrev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all z-20"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <button 
+        onClick={handleNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all z-20"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
       {/* Indicadores */}
       <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
         {BANNERS.map((_, i) => (

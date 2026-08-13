@@ -70,8 +70,12 @@ export function useCart() {
   const addToCart = useCallback(
     (
       product: Pick<Product, "id" | "name" | "price" | "image_url" | "stock" | "images">,
-      selectedSpecs?: Record<string, string>
+      selectedSpecs?: Record<string, string>,
+      quantity = 1,
     ): { success: boolean; message: string } => {
+      if (!Number.isSafeInteger(quantity) || quantity < 1) {
+        return { success: false, message: "Cantidad inválida." };
+      }
       const currentCart = readCart();
 
       // Buscar item existente con mismo product id y mismas specs
@@ -86,11 +90,14 @@ export function useCart() {
       });
 
       if (existing) {
-        if (existing.quantity >= product.stock) {
+        if (existing.quantity + quantity > product.stock) {
           return { success: false, message: "Stock máximo alcanzado." };
         }
-        existing.quantity += 1;
+        existing.quantity += quantity;
       } else {
+        if (quantity > product.stock) {
+          return { success: false, message: "Stock máximo alcanzado." };
+        }
         const displayImage =
           product.images && product.images.length > 0
             ? product.images[0]
@@ -102,7 +109,8 @@ export function useCart() {
           name: product.name,
           price: Number(product.price),
           image_url: displayImage,
-          quantity: 1,
+          quantity,
+          stock: product.stock,
           selectedSpecs: selectedSpecs ? { ...selectedSpecs } : undefined,
         });
       }
@@ -119,7 +127,9 @@ export function useCart() {
       const currentCart = readCart();
       const updated = currentCart.map((item) => {
         const matchId = item.cartItemId || item.id.toString();
-        return matchId === cartItemId ? { ...item, quantity } : item;
+        if (matchId !== cartItemId) return item;
+        const nextQuantity = item.stock ? Math.min(quantity, item.stock) : quantity;
+        return { ...item, quantity: nextQuantity };
       });
       writeCart(updated);
     },

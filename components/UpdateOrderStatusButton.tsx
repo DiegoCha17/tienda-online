@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 type Props = { orderId: number; currentStatus: string };
 export default function UpdateOrderStatusButton({
   orderId,
@@ -21,10 +22,11 @@ export default function UpdateOrderStatusButton({
       if (!res.ok) {
         throw new Error(data.error || "Error al actualizar estado");
       }
+      toast.success("Estado del pedido actualizado");
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("No se pudo actualizar el estado del pedido");
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el estado del pedido");
     } finally {
       setLoading(false);
     }

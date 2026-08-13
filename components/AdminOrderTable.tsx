@@ -7,7 +7,6 @@ import DeleteOrderButton from "./DeleteOrderButton";
 import {
   ClipboardList,
   Search,
-  Filter,
   User,
   Mail,
   Phone,

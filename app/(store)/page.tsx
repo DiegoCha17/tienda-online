@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { Suspense } from "react";
 import { OrganizationJsonLd } from "@/components/JsonLd";
 import ProductCardSkeleton from "@/components/skeletons/ProductCardSkeleton";
+import type { Product } from "@/lib/types";
 
 // Caché de la DB para evitar saturación (revalida cada 60 segundos)
 const getCachedProducts = unstable_cache(
@@ -16,11 +17,6 @@ const getCachedProducts = unstable_cache(
 
 export default async function HomePage() {
   const products = await getCachedProducts();
-  const categoriesSet = new Set(
-    products.map((p: any) => p.category || "General"),
-  );
-  const categories = Array.from(categoriesSet) as string[];
-  
   return (
     <>
       <OrganizationJsonLd />
@@ -36,8 +32,7 @@ export default async function HomePage() {
         }
       >
         <StoreFront
-          initialProducts={products as any}
-          categories={categories.sort()}
+          initialProducts={products as unknown as Product[]}
         />
       </Suspense>
     </>

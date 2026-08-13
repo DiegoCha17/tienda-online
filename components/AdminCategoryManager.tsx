@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 type Category = { id: number; name: string };
 export default function AdminCategoryManager() {
   const router = useRouter();
@@ -28,12 +29,16 @@ export default function AdminCategoryManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
-      if (!res.ok) throw new Error("Error al crear categoría");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Error al crear categoría");
+      }
+      toast.success("Categoría creada correctamente");
       setName("");
       await loadCategories();
       router.refresh();
-    } catch (error: any) {
-      alert("No se pudo crear la categoría");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la categoría");
     } finally {
       setLoading(false);
     }
@@ -52,8 +57,8 @@ export default function AdminCategoryManager() {
       if (!res.ok) throw new Error("Error al eliminar categoría");
       await loadCategories();
       router.refresh();
-    } catch (error: any) {
-      alert("No se pudo eliminar la categoría");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la categoría");
     }
   };
   return (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { sql } from "@/lib/db";
 import { formatCRC } from "@/lib/currency";
 import { Package, ShoppingBag, AlertTriangle, DollarSign } from "lucide-react";
+import { isValidAdminToken } from "@/lib/admin-auth";
 
 type RecentOrder = {
   id: number;
@@ -15,7 +16,7 @@ type RecentOrder = {
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get("admin_auth")?.value === "true";
+  const isAuthenticated = isValidAdminToken(cookieStore.get("admin_auth")?.value);
   
   if (!isAuthenticated) {
     redirect("/admin/login");
@@ -23,7 +24,7 @@ export default async function AdminPage() {
 
   // Fetch metrics
   try {
-    const products = await sql`SELECT COUNT(*) as count FROM products`;
+    const products = await sql`SELECT COUNT(*) as count FROM products WHERE active = TRUE`;
     const lowStock = await sql`SELECT COUNT(*) as count FROM products WHERE stock <= 5 AND active = TRUE`;
     const orders = await sql`SELECT COUNT(*) as count, SUM(total) as revenue FROM orders`;
     const recentOrders = (await sql`SELECT id, customer_name, total, created_at, status FROM orders ORDER BY created_at DESC LIMIT 5`) as unknown as RecentOrder[];
@@ -33,8 +34,8 @@ export default async function AdminPage() {
     const totalOrders = orders[0]?.count || 0;
     const totalRevenue = orders[0]?.revenue || 0;
 
-    return (
-      <main className="max-w-7xl mx-auto p-6 md:p-8 min-h-screen bg-gray-50">
+      return (
+      <section>
         
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
@@ -42,14 +43,6 @@ export default async function AdminPage() {
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">Dashboard General</h1>
             <p className="text-gray-500 font-medium">Bienvenido de vuelta, administrador.</p>
           </div>
-          <form action="/api/admin/logout" method="POST">
-            <button
-              type="submit"
-              className="bg-white border border-gray-200 text-gray-700 hover:text-red-600 hover:bg-red-50 hover:border-red-100 px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm"
-            >
-              Cerrar Sesión
-            </button>
-          </form>
         </div>
 
         {/* Metrics Grid */}
@@ -182,18 +175,18 @@ export default async function AdminPage() {
           </div>
 
         </div>
-      </main>
+        </section>
     );
   } catch (error) {
     console.error("Dashboard error:", error);
     return (
-      <main className="max-w-7xl mx-auto p-6 min-h-screen flex items-center justify-center">
+        <section className="flex min-h-[60vh] items-center justify-center">
         <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 text-center">
           <AlertTriangle className="w-10 h-10 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Error cargando el dashboard</h2>
           <p>No se pudieron obtener las métricas de la base de datos.</p>
         </div>
-      </main>
+        </section>
     );
   }
 }

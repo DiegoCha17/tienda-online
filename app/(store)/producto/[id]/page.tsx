@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { sql } from "@/lib/db";
 import { notFound } from "next/navigation";
 import ProductDetailClient from "@/components/ProductDetailClient";
+import type { Product } from "@/lib/types";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -11,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   if (products.length === 0) return { title: "Producto no encontrado | Mi Tienda" };
   
-  const product = products[0] as any;
+  const product = products[0] as { name: string; description: string; image_url: string };
   
   return {
     title: `${product.name} | Mi Tienda`,
@@ -39,7 +40,7 @@ export default async function ProductDetailPage({ params }: Props) {
   }
   return (
     <main className="max-w-7xl mx-auto px-4 py-2 mt-4 sm:mt-6">
-      <ProductDetailClient product={products[0] as any} />
+      <ProductDetailClient product={products[0] as unknown as Product} />
     </main>
   );
 }

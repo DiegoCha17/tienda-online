@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 type Props = { orderId: number };
 export default function DeleteOrderButton({ orderId }: Props) {
   const router = useRouter();
@@ -19,10 +20,11 @@ export default function DeleteOrderButton({ orderId }: Props) {
       if (!res.ok) {
         throw new Error(data.error || "Error al eliminar pedido");
       }
+      toast.success("Pedido eliminado");
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("No se pudo eliminar el pedido");
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el pedido");
     } finally {
       setLoading(false);
     }

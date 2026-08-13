@@ -10,6 +10,7 @@ export default function CartIcon() {
   return (
     <Link
       href="/carrito"
+      aria-label={`Carrito${itemCount > 0 ? `, ${itemCount} productos` : ""}`}
       className="relative p-2.5 bg-gray-50 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors group border border-gray-100"
     >
       <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />

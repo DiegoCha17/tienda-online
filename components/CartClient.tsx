@@ -109,37 +109,34 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] py-12 px-4 sm:px-6 lg:px-8 transition-colors animate-fade-in">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-8 tracking-tight">
-          Tu Carrito de Compras
-        </h1>
-        
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-7"><p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Compra segura</p><h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Tu carrito</h1><p className="mt-2 text-sm text-slate-500">Revisa tus productos antes de completar el pedido.</p></div>
         {cart.length === 0 ? (
-          <div className="bg-white rounded-[2rem] shadow-sm p-16 text-center space-y-6 border border-gray-100 animate-slide-up">
-            <div className="text-8xl mb-6">🛒</div>
-            <h2 className="text-3xl font-bold text-gray-800">
+           <div className="mx-auto max-w-2xl space-y-5 rounded-3xl border border-slate-200 bg-white px-5 py-14 text-center shadow-sm sm:p-16">
+             <div className="mb-5 text-6xl">🛒</div>
+             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               No hay productos en tu carrito
             </h2>
-            <p className="text-lg text-gray-500">
+             <p className="text-base text-slate-500 sm:text-lg">
               ¿Qué te parece si exploramos algunos productos increíbles?
             </p>
             <Link
               href="/#catalogo"
-              className="inline-block mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-indigo-500/30"
+               className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-7 font-bold text-white shadow-lg transition hover:bg-indigo-700"
             >
               Ir a comprar
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
             <div className="lg:col-span-2 space-y-6">
               {cart.map((item) => (
                 <div
                   key={item.cartItemId || item.id}
-                  className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 p-5 sm:p-6 flex flex-col sm:flex-row gap-6 items-center border border-gray-100 transform hover:-translate-y-1 animate-slide-up"
+                   className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center sm:p-5"
                 >
-                  <div className="relative w-32 h-32 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
+                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 sm:h-28 sm:w-28">
                     <Image
                       src={item.image_url || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"}
                       alt={item.name}
@@ -148,8 +145,8 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                       className="object-contain p-2"
                     />
                   </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                   <div className="min-w-0 flex-1 text-center sm:text-left">
+                     <h2 className="mb-1 line-clamp-2 text-base font-bold text-slate-900 sm:text-lg">
                       {item.name}
                     </h2>
                     {item.selectedSpecs &&
@@ -177,8 +174,8 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                       </span>
                     </p>
                   </div>
-                  <div className="flex flex-col items-center sm:items-end gap-5 min-w-[140px]">
-                    <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+                   <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:min-w-[140px] sm:flex-col sm:items-end sm:gap-4">
+                     <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
                       <button
                         type="button"
                         onClick={() =>
@@ -239,8 +236,8 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
             </div>
             
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-[2rem] shadow-2xl shadow-indigo-500/5 p-8 border border-gray-100 sticky top-24 animate-slide-up">
-                <h3 className="text-2xl font-black text-gray-900 mb-6">
+               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7 lg:sticky lg:top-24">
+                 <h3 className="mb-5 text-xl font-black text-slate-950 sm:text-2xl">
                   Resumen
                 </h3>
                 <div className="flex justify-between items-center mb-6 pb-6 border-b border-gray-100">
@@ -253,7 +250,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                   <span className="text-xl font-bold text-gray-900">
                     Total
                   </span>
-                  <span className="text-3xl font-black text-indigo-600">
+                   <span className="text-2xl font-black text-indigo-700 sm:text-3xl">
                     {formatCRC(total)}
                   </span>
                 </div>
@@ -263,7 +260,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                     <button
                       type="button"
                       onClick={() => setShowForm(true)}
-                      className="w-full bg-gray-900 hover:bg-black text-white font-semibold px-6 py-4 rounded-xl transition-all shadow-lg shadow-gray-900/20 transform hover:-translate-y-1 text-lg"
+                       className="min-h-13 w-full rounded-xl bg-slate-950 px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-indigo-700 sm:text-lg"
                     >
                       Completar Datos
                     </button>

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { cookies } from "next/headers";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { isValidAdminToken } from "@/lib/admin-auth";
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get("admin_auth")?.value === "true";
+    const cookieValue = req.headers.get("cookie")?.match(/(?:^|;\s*)admin_auth=([^;]+)/)?.[1];
+    const isAuthenticated = isValidAdminToken(cookieValue);
     if (!isAuthenticated) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
@@ -15,35 +16,37 @@ export async function POST(req: Request) {
     const category = body.category?.trim() || "General";
     const price = Number(body.price);
     const stock = Number(body.stock ?? 0);
-    if (!name) {
+    if (!name || name.length > 160) {
       return NextResponse.json(
         { error: "El nombre es obligatorio" },
         { status: 400 },
       );
     }
-    if (Number.isNaN(price) || price <= 0) {
+    if (!Number.isFinite(price) || price <= 0) {
       return NextResponse.json(
         { error: "El precio debe ser un número válido mayor a 0" },
         { status: 400 },
       );
     }
-    if (Number.isNaN(stock) || stock < 0) {
+    if (!Number.isSafeInteger(stock) || stock < 0) {
       return NextResponse.json(
         { error: "El stock debe ser un número válido" },
         { status: 400 },
       );
     }
-    const images = Array.isArray(body.images) ? body.images : [];
+    const images = Array.isArray(body.images) && body.images.every((image: unknown) => typeof image === "string") ? body.images : [];
     const specifications =
       typeof body.specifications === "object" ? body.specifications : {};
     const features = typeof body.features === "object" ? body.features : {};
     const result =
       await sql` INSERT INTO products ( name, description, price, image_url, stock, category, active, images, specifications, features ) VALUES ( ${name}, ${description}, ${price}, ${image_url}, ${stock}, ${category}, TRUE, ${JSON.stringify(images)}, ${JSON.stringify(specifications)}, ${JSON.stringify(features)} ) RETURNING id `;
+    revalidateTag("products", "max");
+    revalidatePath("/");
     return NextResponse.json({ success: true, productId: result[0].id });
   } catch (error) {
     console.error("Error creando producto:", error);
     return NextResponse.json(
-      { error: "No se pudo crear el producto", details: String(error) },
+      { error: "No se pudo crear el producto" },
       { status: 500 },
     );
   }

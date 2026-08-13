@@ -21,7 +21,24 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1f2937; /* gray-800 */
+  --foreground: #182033;
+  --surface-soft: #f5f7fb;
+  --surface-muted: #eef1f7;
+  --ink-muted: #667085;
+  --line: #e4e8f0;
+  --accent: #5967d9;
+  --accent-deep: #3d4bb5;
+  --accent-wash: #eef0ff;
+  --radius-card: 1.25rem;
+  --shadow-card: 0 12px 30px -20px rgb(24 32 51 / 0.35);
+}
+
+@theme {
+  --color-ink: #182033;
+  --color-muted: #667085;
+  --color-line: #e4e8f0;
+  --color-accent: #5967d9;
+  --color-accent-deep: #3d4bb5;
 }
 
 @keyframes fade-in {
@@ -39,6 +56,36 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: #dfe3ff;
+  color: #182033;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom Scrollbar */

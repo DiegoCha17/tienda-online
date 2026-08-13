@@ -3,6 +3,7 @@
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/lib/hooks/useWishlist";
 import type { Product } from "@/lib/types";
+import { toast } from "sonner";
 
 type Props = {
   product: Product;
@@ -16,10 +17,11 @@ export default function WishlistToggle({ product, className = "", iconSize = 20 
   // Convertimos a boolean
   const isFav = isInWishlist(product.id);
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleWishlist(product);
+    const result = toggleWishlist(product);
+    toast.success(result.added ? "Agregado a favoritos" : "Quitado de favoritos");
   };
 
   return (

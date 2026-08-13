@@ -101,8 +101,8 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
       clearCart();
       setShowForm(false);
       reset();
-    } catch (error: any) {
-      toast.error(error.message || "No se pudo enviar el pedido");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar el pedido");
     } finally {
       setLoading(false);
     }
@@ -180,12 +180,14 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                   <div className="flex flex-col items-center sm:items-end gap-5 min-w-[140px]">
                     <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
                       <button
+                        type="button"
                         onClick={() =>
                           updateQuantity(
                             item.cartItemId || item.id.toString(),
                             item.quantity - 1,
                           )
                         }
+                        aria-label={`Reducir cantidad de ${item.name}`}
                         className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-600 font-medium text-lg"
                       >
                         -
@@ -194,12 +196,14 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                         {item.quantity}
                       </span>
                       <button
+                        type="button"
                         onClick={() =>
                           updateQuantity(
                             item.cartItemId || item.id.toString(),
                             item.quantity + 1,
                           )
                         }
+                        aria-label={`Aumentar cantidad de ${item.name}`}
                         className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-600 font-medium text-lg"
                       >
                         +
@@ -210,6 +214,7 @@ export default function CartClient({ whatsappNumber }: CartClientProps) {
                       onClick={() =>
                         handleRemoveItem(item.cartItemId || item.id.toString())
                       }
+                      aria-label={`Eliminar ${item.name} del carrito`}
                       className="text-red-500 hover:text-red-700 text-sm font-semibold transition-colors flex items-center gap-1"
                     >
                       <svg

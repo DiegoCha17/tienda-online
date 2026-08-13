@@ -71,7 +71,7 @@ export default function ProductCard({ product, isCompact, index = 0 }: Props) {
       >
         <Link
           href={`/producto/${product.id}`}
-          className="flex-grow block group/title outline-none"
+          className="flex-grow block group/title outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg"
         >
           <h2
             className={`${
@@ -122,7 +122,7 @@ export default function ProductCard({ product, isCompact, index = 0 }: Props) {
                   <ShoppingCart className="w-5 h-5" /> Elegir opciones
                 </Link>
               ) : (
-                <AddToCartButton product={product as any} />
+                <AddToCartButton product={product} />
               )}
             </div>
           ) : (

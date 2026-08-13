@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ShoppingCart, CheckCircle2 } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
 import type { Product } from "@/lib/types";
+import { toast } from "sonner";
 
 type Props = {
   product: Pick<Product, "id" | "name" | "price" | "image_url" | "stock">;
@@ -20,7 +21,10 @@ export default function AddToCartButton({ product, className = "" }: Props) {
     const result = addToCart(product);
     if (result.success) {
       setIsAdded(true);
+      toast.success(`${product.name} agregado al carrito`);
       setTimeout(() => setIsAdded(false), 2000);
+    } else {
+      toast.error(result.message);
     }
   };
 

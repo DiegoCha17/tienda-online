@@ -10,7 +10,7 @@ const getCategories = unstable_cache(
   async () => {
     try {
       const products = await sql`SELECT DISTINCT category FROM products WHERE active = TRUE`;
-      const categoriesSet = new Set(products.map((p: any) => p.category || "General"));
+      const categoriesSet = new Set(products.map((p) => p.category || "General"));
       return Array.from(categoriesSet).sort() as string[];
     } catch (error) {
       console.error("Error fetching categories for header:", error);

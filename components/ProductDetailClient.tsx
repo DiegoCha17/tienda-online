@@ -115,12 +115,14 @@ export default function ProductDetailClient({ product }: Props) {
               <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
                 <button
                   onClick={(e) => {e.stopPropagation(); handlePrevImage();}}
+                  aria-label="Imagen anterior"
                   className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl hover:bg-white transition-all active:scale-90"
                 >
                   <ChevronLeft className="w-6 h-6 text-indigo-600" />
                 </button>
                 <button
                   onClick={(e) => {e.stopPropagation(); handleNextImage();}}
+                  aria-label="Imagen siguiente"
                   className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl hover:bg-white transition-all active:scale-90"
                 >
                   <ChevronRight className="w-6 h-6 text-indigo-600" />
@@ -135,6 +137,7 @@ export default function ProductDetailClient({ product }: Props) {
                 <button
                   key={idx}
                   onClick={() => setCurrentImageIndex(idx)}
+                  aria-label={`Ver imagen ${idx + 1} de ${product.name}`}
                   className={`relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all ${
                     currentImageIndex === idx
                       ? "border-indigo-600 scale-105 shadow-xl shadow-indigo-100 rotate-1"
@@ -166,7 +169,7 @@ export default function ProductDetailClient({ product }: Props) {
             </p>
           </div>
 
-          <p className="text-gray-500 text-lg leading-relaxed font-bold mb-10 border-l-[6px] border-indigo-600 pl-8 italic bg-indigo-50/30 py-4 py-r-4 rounded-r-3xl">
+           <p className="text-gray-500 text-lg leading-relaxed font-bold mb-10 border-l-[6px] border-indigo-600 pl-8 italic bg-indigo-50/30 py-4 rounded-r-3xl">
             {product.description || "Diseño y funcionalidad en su estado más puro."}
           </p>
 

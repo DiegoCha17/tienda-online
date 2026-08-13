@@ -10,6 +10,7 @@ export default function WishlistIcon() {
   return (
     <Link
       href="/favoritos"
+      aria-label={`Favoritos${wishlistCount > 0 ? `, ${wishlistCount} productos` : ""}`}
       className="relative p-2.5 bg-gray-50 text-gray-700 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors group border border-gray-100 hidden sm:block"
     >
       <Heart className="w-6 h-6 group-hover:scale-110 transition-transform" />

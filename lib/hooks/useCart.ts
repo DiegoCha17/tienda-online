@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import type { CartItem, Product } from "@/lib/types";
 import { CART_STORAGE_KEY, CART_UPDATED_EVENT } from "@/lib/constants";
 

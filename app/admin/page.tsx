@@ -3,7 +3,15 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { sql } from "@/lib/db";
 import { formatCRC } from "@/lib/currency";
-import { Package, ShoppingBag, AlertTriangle, TrendingUp, Users, DollarSign } from "lucide-react";
+import { Package, ShoppingBag, AlertTriangle, DollarSign } from "lucide-react";
+
+type RecentOrder = {
+  id: number;
+  customer_name: string;
+  total: number;
+  created_at: string;
+  status: string;
+};
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
@@ -18,7 +26,7 @@ export default async function AdminPage() {
     const products = await sql`SELECT COUNT(*) as count FROM products`;
     const lowStock = await sql`SELECT COUNT(*) as count FROM products WHERE stock <= 5 AND active = TRUE`;
     const orders = await sql`SELECT COUNT(*) as count, SUM(total) as revenue FROM orders`;
-    const recentOrders = await sql`SELECT id, customer_name, total, created_at, status FROM orders ORDER BY created_at DESC LIMIT 5`;
+    const recentOrders = (await sql`SELECT id, customer_name, total, created_at, status FROM orders ORDER BY created_at DESC LIMIT 5`) as unknown as RecentOrder[];
 
     const totalProducts = products[0]?.count || 0;
     const lowStockProducts = lowStock[0]?.count || 0;
@@ -148,7 +156,7 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {recentOrders.map((order: any) => (
+                    {recentOrders.map((order: RecentOrder) => (
                       <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="py-4 text-sm font-bold text-gray-900">#{order.id}</td>
                         <td className="py-4 text-sm font-medium text-gray-700">{order.customer_name}</td>

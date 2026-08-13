@@ -1,76 +1,60 @@
 "use client";
 import { useState } from "react";
-type Product = { id: number; name: string; price: number; image_url: string };
-type Props = { product: Product };
-export default function AddToCartButton({ product }: Props) {
+import { ShoppingCart, CheckCircle2 } from "lucide-react";
+import { useCart } from "@/lib/hooks/useCart";
+import type { Product } from "@/lib/types";
+import { toast } from "sonner";
+
+type Props = {
+  product: Pick<Product, "id" | "name" | "price" | "image_url" | "stock">;
+  className?: string;
+};
+
+export default function AddToCartButton({ product, className = "" }: Props) {
+  const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
-  const addToCart = () => {
-    const raw = localStorage.getItem("cart");
-    const cart = raw ? JSON.parse(raw) : [];
-    const existing = cart.find((item: any) => item.id === product.id);
-    if (existing) {
-      existing.quantity += 1;
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (product.stock <= 0) return;
+
+    const result = addToCart(product);
+    if (result.success) {
+      setIsAdded(true);
+      toast.success(`${product.name} agregado al carrito`);
+      setTimeout(() => setIsAdded(false), 2000);
     } else {
-      cart.push({
-        id: product.id,
-        cartItemId:
-          Date.now().toString() + Math.random().toString(36).substring(2),
-        name: product.name,
-        price: Number(product.price),
-        image_url: product.image_url,
-        quantity: 1,
-      });
+      toast.error(result.message);
     }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    window.dispatchEvent(new Event("cart-updated"));
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
   };
+
   return (
     <button
-      onClick={addToCart}
-      className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${isAdded ? "bg-green-600 text-white shadow-lg shadow-green-600/30" : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 hover:-translate-y-1"}`}
+      onClick={handleAdd}
+      disabled={product.stock <= 0}
+      className={`w-full py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-sm ${
+        product.stock <= 0
+          ? "bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200"
+          : isAdded
+          ? "bg-emerald-500 text-white shadow-emerald-500/30 scale-95"
+          : "bg-gray-900 hover:bg-black text-white shadow-gray-900/20 hover:-translate-y-1 hover:shadow-lg"
+      } ${className}`}
     >
-      {" "}
-      {isAdded ? (
+      {product.stock <= 0 ? (
+        <span className="text-[10px] uppercase tracking-widest font-black">
+          Agotado
+        </span>
+      ) : isAdded ? (
         <>
-          {" "}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>{" "}
-          Agregado{" "}
+          <CheckCircle2 className="w-5 h-5 animate-bounce" />
+          <span className="text-sm">Agregado</span>
         </>
       ) : (
         <>
-          {" "}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>{" "}
-          Agregar al carrito{" "}
+          <ShoppingCart className="w-5 h-5" />
+          <span className="text-sm">Agregar al carrito</span>
         </>
-      )}{" "}
+      )}
     </button>
   );
 }

@@ -30,6 +30,8 @@ export default function MobileMenuClient({ categories }: Props) {
         onClick={() => setIsOpen(true)}
         className="p-2 -mr-2 text-gray-700 hover:text-black transition-colors focus:outline-none"
         aria-label="Abrir menú"
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
       >
         <Menu className="w-7 h-7" />
       </button>
@@ -47,6 +49,8 @@ export default function MobileMenuClient({ categories }: Props) {
         className={`fixed inset-y-0 right-0 z-[70] w-full max-w-xs bg-white shadow-2xl transform transition-transform duration-500 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        id="mobile-navigation"
+        aria-hidden={!isOpen}
       >
         <div className="h-full flex flex-col p-6 overflow-y-auto">
           {/* Header of Menu */}

@@ -1,18 +1,25 @@
 import Link from "next/link";
 import CartIcon from "./CartIcon";
+import WishlistIcon from "./WishlistIcon";
 import MobileMenuClient from "./MobileMenuClient";
 import { sql } from "@/lib/db";
 
-async function getCategories() {
-  try {
-    const products = await sql`SELECT DISTINCT category FROM products WHERE active = TRUE`;
-    const categoriesSet = new Set(products.map((p: any) => p.category || "General"));
-    return Array.from(categoriesSet).sort() as string[];
-  } catch (error) {
-    console.error("Error fetching categories for header:", error);
-    return [];
-  }
-}
+import { unstable_cache } from "next/cache";
+
+const getCategories = unstable_cache(
+  async () => {
+    try {
+      const products = await sql`SELECT DISTINCT category FROM products WHERE active = TRUE`;
+      const categoriesSet = new Set(products.map((p) => p.category || "General"));
+      return Array.from(categoriesSet).sort() as string[];
+    } catch (error) {
+      console.error("Error fetching categories for header:", error);
+      return [];
+    }
+  },
+  ['header-categories'],
+  { revalidate: 3600, tags: ['categories'] }
+);
 
 export default async function SiteHeader() {
   const categories = await getCategories();
@@ -74,9 +81,7 @@ export default async function SiteHeader() {
             <button className="hidden sm:block hover:text-black transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </button>
-            <button className="hidden sm:block hover:text-black transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-            </button>
+            <WishlistIcon />
             <CartIcon />
             {/* Hamburger menu for mobile devices */}
             <MobileMenuClient categories={categories} />
